@@ -11,14 +11,15 @@ calcul returns[ String code ] @ init
    ;
 
 expression
-    :
-    | expression '*' expression
-    | expression '+' expression
-    | ENTIER
-    | FLOAT
-;
-
-
+   :
+   | expression '^' expression // la puissance doit être prioritaire
+   | expression '*' expression
+   | expression '/' expression
+   | expression '+' expression
+   | expression '-' expression
+   | ENTIER
+   | FLOAT
+   ;
 
 finInstruction
    : (NEWLINE | ';')+
@@ -52,10 +53,8 @@ assignation returns[ String code ]
 // à compléter
 }
    ;
-
-
 /*=========================== lexer ========================*/
-
+   
    
 NEWLINE
    : '\r'? '\n' -> skip
@@ -69,8 +68,6 @@ ENTIER
    : ('0' .. '9')+
    ;
 
-
-
 UNMATCH
    : . -> skip
    ;
@@ -80,16 +77,18 @@ TYPE
    | 'float'
    | 'bool'
    ; // pour pouvoir gérer des entiers, Booléens et floats
-
+   
 FLOAT
-    :   ('0'..'9')+ '.' ('0'..'9')* EXPONENT?
-     |   '.' ('0'..'9')+ EXPONENT?
-     |   ('0'..'9')+ EXPONENT
-    ;
+   : ('0' .. '9')+ '.' ('0' .. '9')* EXPONENT?
+   | '.' ('0' .. '9')+ EXPONENT?
+   | ('0' .. '9')+ EXPONENT
+   ;
 
 IDENTIFIANT
-   : ('a'..'z'|'A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'0'..'9'|'_')*
+   : ('a' .. 'z' | 'A' .. 'Z' | '_') ('a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_')*
    ; //à compléter
    
+EXPONENT
+   : ('e' | 'E') ('+' | '-')? ('0' .. '9')+
+   ;
 
-EXPONENT : ('e'|'E') ('+'|'-')? ('0'..'9')+ ;
