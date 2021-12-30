@@ -1,4 +1,4 @@
-lexer grammar calculette;
+grammar calculette;
 
 calcul returns[ String code ] @ init
    { $code = new String(); } // On initialise $code, pour ensuite l'utiliser comme accumulateur
@@ -9,6 +9,16 @@ calcul returns[ String code ] @ init
    { $code += $instruction.code; })*
    { $code += " HALT\n"; }
    ;
+
+expression
+    :
+    | expression '*' expression
+    | expression '+' expression
+    | ENTIER
+    | FLOAT
+;
+
+
 
 finInstruction
    : (NEWLINE | ';')+
@@ -42,15 +52,44 @@ assignation returns[ String code ]
 // à compléter
 }
    ;
-   // lexer
+
+
+/*=========================== lexer ========================*/
+
    
+NEWLINE
+   : '\r'? '\n' -> skip
+   ;
+
+WS
+   : (' ' | '\t')+ -> skip
+   ;
+
+ENTIER
+   : ('0' .. '9')+
+   ;
+
+
+
+UNMATCH
+   : . -> skip
+   ;
+
 TYPE
    : 'int'
    | 'float'
    | 'bool'
    ; // pour pouvoir gérer des entiers, Booléens et floats
-   
+
+FLOAT
+    :   ('0'..'9')+ '.' ('0'..'9')* EXPONENT?
+     |   '.' ('0'..'9')+ EXPONENT?
+     |   ('0'..'9')+ EXPONENT
+    ;
+
 IDENTIFIANT
-   :
+   : ('a'..'z'|'A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'0'..'9'|'_')*
    ; //à compléter
    
+
+EXPONENT : ('e'|'E') ('+'|'-')? ('0'..'9')+ ;

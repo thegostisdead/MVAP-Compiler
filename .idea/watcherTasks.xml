@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ProjectTasksOptions">
-    <TaskOptions isEnabled="true">
+    <TaskOptions isEnabled="false">
       <option name="arguments" value="-jar /tmp/antlr4-formatter-standalone-1.2.2-SNAPSHOT.jar --input=$ContentRoot$/calculette.g4" />
       <option name="checkSyntaxErrors" value="true" />
       <option name="description" />
-      <option name="exitCodeBehavior" value="ALWAYS" />
+      <option name="exitCodeBehavior" value="ERROR" />
       <option name="fileExtension" value="g4" />
       <option name="immediateSync" value="true" />
       <option name="name" value="autoformat" />
