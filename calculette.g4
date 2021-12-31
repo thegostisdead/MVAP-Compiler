@@ -25,6 +25,7 @@ expression returns[ String code ]
    | expression '/' expression
    | expression '+' expression
    | expression '-' expression
+   | '-' expression // negative values
    | VARIABLE
    | BOOLEAN
    | IDENTIFIANT
@@ -122,20 +123,10 @@ REPETER
     : 'repeter'
     ;
 
-TYPE
-   : 'int'
-   | 'float'
-   | 'bool'
-   ; // pour pouvoir gérer des entiers, Booléens et floats
+
 
 FLOAT
-   : ('0' .. '9')+ '.' ('0' .. '9')* EXPONENT?
-   | '.' ('0' .. '9')+ EXPONENT?
-   | ('0' .. '9')+ EXPONENT
-   ;
-
-EXPONENT
-   : ('e' | 'E') ('+' | '-')? ('0' .. '9')+
+   : ('0' .. '9')+ '.' ('0' .. '9')*
    ;
 
 
@@ -170,6 +161,12 @@ LE
 EQ
    : '=='
    ;
+
+TYPE
+   : 'int'
+   | 'float'
+   | 'bool'
+   ; // pour pouvoir gérer des entiers, Booléens et floats
 
 VARIABLE
    : ('A' .. 'Z' | 'a' .. 'z') ('A' .. 'Z' | 'a' .. 'z' | '0' .. '9')*
