@@ -18,12 +18,14 @@ expression returns[ String code ]
    : LPAREN expression RPAREN
    | NOT expression
    | expression 'and' expression
+   | expression 'or' expression
    | expression (GT | GE | LT | LE | EQ) expression
    | expression '^' expression // la puissance doit être prioritaire
    | expression '*' expression
    | expression '/' expression
    | expression '+' expression
    | expression '-' expression
+   | VARIABLE
    | BOOLEAN
    | IDENTIFIANT
    | ENTIER
@@ -40,24 +42,49 @@ declaration returns[ String code ]
 
 assignation returns[ String code ]
    : VARIABLE '=' expression
-   {}
    ;
+
+/* les instructions afficher / lire  */
+lire returns[ String code ]
+    : LIRE LPAREN expression RPAREN
+    ;
+
+afficher returns[ String code ]
+    : AFFICHER LPAREN expression RPAREN
+    ;
+
+/* --------------------------------- */
+tantque returns[ String code ]
+    : TANTQUE LPAREN expression RPAREN
+    ;
+
+
+repeter returns[ String code ]
+    : REPETER '{' instruction* '}' tantque
+    // | REPETER NEWLINE instruction+ NEWLINE tantque
+    ;
 
 instruction returns[ String code ]
    : expression finInstruction
-   | 'repeter' '{' instruction* '}'
-   | 'repeter' '\n' instruction+ NEWLINE 'tantque' LPAREN expression RPAREN
-   | 'tantque' expression
-   | 'afficher' '(' IDENTIFIANT ')' finInstruction
-   | 'lire' '(' IDENTIFIANT ')' finInstruction
+   | repeter
+   | tantque
+   | afficher finInstruction
+   | lire finInstruction
    | declaration finInstruction
    | assignation finInstruction
    | finInstruction
    {$code="";}
    ;
 /*=========================== lexer ========================*/
-   
-   
+
+LPAREN
+   : '('
+   ;
+
+RPAREN
+   : ')'
+   ;
+
 BOOLEAN
    : 'true'
    | 'false'
@@ -79,15 +106,27 @@ UNMATCH
    : . -> skip
    ;
 
+LIRE
+    : 'lire'
+    ;
+
+AFFICHER
+    : 'afficher'
+    ;
+
+TANTQUE
+    : 'tantque'
+    ;
+
+REPETER
+    : 'repeter'
+    ;
+
 TYPE
    : 'int'
    | 'float'
    | 'bool'
    ; // pour pouvoir gérer des entiers, Booléens et floats
-   
-VARIABLE
-   : ('A' .. 'Z' | 'a' .. 'z') ('A' .. 'Z' | 'a' .. 'z' | '0' .. '9')*
-   ;
 
 FLOAT
    : ('0' .. '9')+ '.' ('0' .. '9')* EXPONENT?
@@ -95,13 +134,10 @@ FLOAT
    | ('0' .. '9')+ EXPONENT
    ;
 
-IDENTIFIANT
-   : ('a' .. 'z' | 'A' .. 'Z' | '_') ('a' .. 'z' | 'A' .. 'Z' | '_' | '0' .. '9')*
-   ; //à compléter
-   
 EXPONENT
    : ('e' | 'E') ('+' | '-')? ('0' .. '9')+
    ;
+
 
 AND
    : 'and'
@@ -135,11 +171,11 @@ EQ
    : '=='
    ;
 
-LPAREN
-   : '('
+VARIABLE
+   : ('A' .. 'Z' | 'a' .. 'z') ('A' .. 'Z' | 'a' .. 'z' | '0' .. '9')*
    ;
 
-RPAREN
-   : ')'
+IDENTIFIANT
+   : ('a' .. 'z' | 'A' .. 'Z' | '_') ('a' .. 'z' | 'A' .. 'Z' | '_' | '0' .. '9')*
    ;
 
