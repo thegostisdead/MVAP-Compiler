@@ -35,24 +35,25 @@ finInstruction
    ;
 
 declaration returns[ String code ]
-   : TYPE IDENTIFIANT finInstruction
+   : TYPE VARIABLE
+   ;
+
+assignation returns[ String code ]
+   : VARIABLE '=' expression
    {}
    ;
 
 instruction returns[ String code ]
    : expression finInstruction
    | 'repeter' '{' instruction* '}'
-   // | 'repeter' '\n' instruction+ '\n' 'tantque' LPAREN expression RPAREN
+   | 'repeter' '\n' instruction+ NEWLINE 'tantque' LPAREN expression RPAREN
    | 'tantque' expression
    | 'afficher' '(' IDENTIFIANT ')' finInstruction
    | 'lire' '(' IDENTIFIANT ')' finInstruction
+   | declaration finInstruction
    | assignation finInstruction
-   | finInstruction {$code="";}
-   ;
-
-assignation returns[ String code ]
-   : VARIABLE '=' expression
-   {}
+   | finInstruction
+   {$code="";}
    ;
 /*=========================== lexer ========================*/
    
@@ -65,15 +66,13 @@ BOOLEAN
 WS
    : (' ' | '\t' | '\r')+ -> skip
    ;
+
 NEWLINE
-    : '\n'
-    ;
-ENTIER
-   : ('0' .. '9')+
+   : '\n'
    ;
 
-VARIABLE
-   : ('A' .. 'Z' | 'a' .. 'z') ('A' .. 'Z' | 'a' .. 'z' | '0' .. '9')*
+ENTIER
+   : ('0' .. '9')+
    ;
 
 UNMATCH
@@ -86,6 +85,10 @@ TYPE
    | 'bool'
    ; // pour pouvoir gérer des entiers, Booléens et floats
    
+VARIABLE
+   : ('A' .. 'Z' | 'a' .. 'z') ('A' .. 'Z' | 'a' .. 'z' | '0' .. '9')*
+   ;
+
 FLOAT
    : ('0' .. '9')+ '.' ('0' .. '9')* EXPONENT?
    | '.' ('0' .. '9')+ EXPONENT?
