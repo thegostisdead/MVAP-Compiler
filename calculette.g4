@@ -1,22 +1,31 @@
 grammar calculette;
 
+@ parser :: members
+{
+    HashMap<String, String> tablesSymboles = new HashMap<String, String>();
+}
 calcul returns[ String code ] @ init
    { $code = new String(); } // On initialise $code, pour ensuite l'utiliser comme accumulateur
    @ after
    { System.out.println($code); } // on affiche le code MVaP stocké dans code
-   : (decl
-   { $code += $decl.code; })* NEWLINE* (instruction
+   : (declaration
+   { $code += $declaration.code; })* NEWLINE* (instruction
    { $code += $instruction.code; })*
    { $code += " HALT\n"; }
    ;
 
-expression
-   :
+expression returns[ String code ]
+   : LPAREN expression RPAREN
+   | NOT expression
+   | expression 'and' expression
+   | expression (GT | GE | LT | LE | EQ) expression
    | expression '^' expression // la puissance doit être prioritaire
    | expression '*' expression
    | expression '/' expression
    | expression '+' expression
    | expression '-' expression
+   | BOOLEAN
+   | IDENTIFIANT
    | ENTIER
    | FLOAT
    ;
@@ -25,47 +34,46 @@ finInstruction
    : (NEWLINE | ';')+
    ;
 
-decl returns[ String code ]
+declaration returns[ String code ]
    : TYPE IDENTIFIANT finInstruction
-   {
-    // à compléter
-}
+   {}
    ;
 
 instruction returns[ String code ]
    : expression finInstruction
-   {
-//à compléter
-}
+   | 'repeter' '{' instruction* '}'
+   // | 'repeter' '\n' instruction+ '\n' 'tantque' LPAREN expression RPAREN
+   | 'tantque' expression
+   | 'afficher' '(' IDENTIFIANT ')' finInstruction
+   | 'lire' '(' IDENTIFIANT ')' finInstruction
    | assignation finInstruction
-   {
-// à compléter
-}
-   | finInstruction
-   {
-$code="";
-}
+   | finInstruction {$code="";}
    ;
 
 assignation returns[ String code ]
-   : IDENTIFIANT '=' expression
-   {
-// à compléter
-}
+   : VARIABLE '=' expression
+   {}
    ;
 /*=========================== lexer ========================*/
    
    
-NEWLINE
-   : '\r'? '\n' -> skip
+BOOLEAN
+   : 'true'
+   | 'false'
    ;
 
 WS
-   : (' ' | '\t')+ -> skip
+   : (' ' | '\t' | '\r')+ -> skip
    ;
-
+NEWLINE
+    : '\n'
+    ;
 ENTIER
    : ('0' .. '9')+
+   ;
+
+VARIABLE
+   : ('A' .. 'Z' | 'a' .. 'z') ('A' .. 'Z' | 'a' .. 'z' | '0' .. '9')*
    ;
 
 UNMATCH
@@ -85,10 +93,50 @@ FLOAT
    ;
 
 IDENTIFIANT
-   : ('a' .. 'z' | 'A' .. 'Z' | '_') ('a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_')*
+   : ('a' .. 'z' | 'A' .. 'Z' | '_') ('a' .. 'z' | 'A' .. 'Z' | '_' | '0' .. '9')*
    ; //à compléter
    
 EXPONENT
    : ('e' | 'E') ('+' | '-')? ('0' .. '9')+
+   ;
+
+AND
+   : 'and'
+   ;
+
+OR
+   : 'or'
+   ;
+
+NOT
+   : 'not'
+   ;
+
+GT
+   : '>'
+   ;
+
+GE
+   : '>='
+   ;
+
+LT
+   : '<'
+   ;
+
+LE
+   : '<='
+   ;
+
+EQ
+   : '=='
+   ;
+
+LPAREN
+   : '('
+   ;
+
+RPAREN
+   : ')'
    ;
 
