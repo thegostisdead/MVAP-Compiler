@@ -44,26 +44,28 @@ declaration returns[ String code ]
 assignation returns[ String code ]
    : VARIABLE '=' expression
    ;
-
 /* les instructions afficher / lire  */
+   
+   
 lire returns[ String code ]
-    : LIRE LPAREN expression RPAREN
-    ;
+   : LIRE LPAREN expression RPAREN
+   ;
 
 afficher returns[ String code ]
-    : AFFICHER LPAREN expression RPAREN
-    ;
-
+   : AFFICHER LPAREN expression RPAREN
+   ;
 /* --------------------------------- */
+   
+   
 tantque returns[ String code ]
-    : TANTQUE LPAREN expression RPAREN
-    ;
-
+   : TANTQUE LPAREN expression RPAREN
+   ;
 
 repeter returns[ String code ]
-    : REPETER '{' instruction* '}' tantque
-    // | REPETER NEWLINE instruction+ NEWLINE tantque
-    ;
+   : REPETER LBRACE instruction* RBRACE tantque
+   // | REPETER NEWLINE instruction+ NEWLINE tantque
+   
+   ;
 
 instruction returns[ String code ]
    : expression finInstruction
@@ -77,6 +79,7 @@ instruction returns[ String code ]
    {$code="";}
    ;
 /*=========================== lexer ========================*/
+   
 
 LPAREN
    : '('
@@ -103,32 +106,30 @@ ENTIER
    : ('0' .. '9')+
    ;
 
+/*
 UNMATCH
    : . -> skip
    ;
-
+*/
 LIRE
-    : 'lire'
-    ;
-
-AFFICHER
-    : 'afficher'
-    ;
-
-TANTQUE
-    : 'tantque'
-    ;
-
-REPETER
-    : 'repeter'
-    ;
-
-
-
-FLOAT
-   : ('0' .. '9')+ '.' ('0' .. '9')*
+   : 'lire'
    ;
 
+AFFICHER
+   : 'afficher'
+   ;
+
+TANTQUE
+   : 'tantque'
+   ;
+
+REPETER
+   : 'repeter'
+   ;
+
+FLOAT
+   : ('0' .. '9')+ '.'
+   ;
 
 AND
    : 'and'
@@ -162,15 +163,33 @@ EQ
    : '=='
    ;
 
+LBRACE
+   : '{'
+   ;
+
+RBRACE
+   : '}'
+   ;
+
+LBRACK
+   : '['
+   ;
+
+RBRACK
+   : ']'
+   ;
+
 TYPE
    : 'int'
    | 'float'
    | 'bool'
    ; // pour pouvoir gérer des entiers, Booléens et floats
 
+
 VARIABLE
-   : ('A' .. 'Z' | 'a' .. 'z') ('A' .. 'Z' | 'a' .. 'z' | '0' .. '9')*
+   : ('A' .. 'Z' | 'a' .. 'z')+
    ;
+
 
 IDENTIFIANT
    : ('a' .. 'z' | 'A' .. 'Z' | '_') ('a' .. 'z' | 'A' .. 'Z' | '_' | '0' .. '9')*

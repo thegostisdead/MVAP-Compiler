@@ -16,3 +16,25 @@ To format the grammar you can install a formatter with the script `install_forma
 - Antlr4 
 - Grun 
 - https://github.com/antlr/Antlr4Formatter.git
+
+| Test file  | Status |
+|---|--------|
+| **op-arith.code**|  ✅  |
+| **affichages.code**|   ✅   |
+| **op-bool.code**|    🚧    |
+| **ifelse2.code**|   🚧     |
+| **ifelse1.code**|   🚧     |
+| **while1.code**|   🚧     |
+| **comparaison.code**|  🚧      |
+| **ifelse01.code**|    🚧    |
+| **ifelse11.code**|   🚧     |
+| **if.code**|    🚧    |
+| **affectations-ctes.code**|   🚧     |
+| **while.code**| 🚧       |
+| **if11.code**|   🚧     |
+| **while2.code**|  🚧      |
+| **if1.code**|  🚧      |
+| **ifelse.code**|   🚧     |
+| **if01.code**|    🚧    |
+| **affectations-exp.code**|    🚧    |
+| **declarations.code**|   🚧     |
