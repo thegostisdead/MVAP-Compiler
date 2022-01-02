@@ -21,11 +21,11 @@ To format the grammar you can install a formatter with the script `install_forma
 |---|--------|
 | **op-arith.code**|  ✅  |
 | **affichages.code**|   ✅   |
-| **op-bool.code**|    🚧    |
+| **op-bool.code**|    ✅   |
 | **ifelse2.code**|   🚧     |
 | **ifelse1.code**|   🚧     |
 | **while1.code**|   🚧     |
-| **comparaison.code**|  🚧      |
+| **comparaison.code**|  ✅      |
 | **ifelse01.code**|    🚧    |
 | **ifelse11.code**|   🚧     |
 | **if.code**|    🚧    |

@@ -1,9 +1,6 @@
 grammar calculette;
 
-@ parser :: members
-{
-    HashMap<String, String> tablesSymboles = new HashMap<String, String>();
-}
+
 calcul returns[ String code ] @ init
    { $code = new String(); } // On initialise $code, pour ensuite l'utiliser comme accumulateur
    @ after
@@ -20,6 +17,7 @@ expression returns[ String code ]
    | expression 'and' expression
    | expression 'or' expression
    | expression (GT | GE | LT | LE | EQ) expression
+   | expression '<>' expression // !=
    | expression '^' expression // la puissance doit être prioritaire
    | expression '*' expression
    | expression '/' expression
@@ -42,7 +40,7 @@ declaration returns[ String code ]
    ;
 
 assignation returns[ String code ]
-   : VARIABLE '=' expression
+   : VARIABLE '=' expression 
    ;
 /* les instructions afficher / lire  */
    

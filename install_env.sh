@@ -1,7 +1,7 @@
 #!/bin/bash
 # This script will install all development tools required for this project 
 # Usage: ./install_env.sh 
-
+set -e
 LIST_OF_APPS="wget nano libc6-i386 libc6-x32 curl unzip"
 
 echo "Create bin directory for antlr..."
@@ -15,8 +15,7 @@ echo "Done."
 
 # install java 
 echo "Install java 17"
-wget https://download.oracle.com/java/17/latest/jdk-17_linux-x64_bin.deb
-sudo dpkg -i jdk-17_linux-x64_bin.deb
+sudo apt install openjdk-17-jdk
 java --version
 echo "Done."
 

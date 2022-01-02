@@ -1,5 +1,5 @@
 #!/bin/bash
-
+set -e
 echo "Installing formatter."
 git clone https://github.com/antlr/Antlr4Formatter.git ~/antlr_formatter
 cd ~/antlr_formatter/ && ./mvnw clean package
