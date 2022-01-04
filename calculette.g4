@@ -40,11 +40,11 @@ declaration returns[ String code ]
    ;
 
 assignation returns[ String code ]
-   : VARIABLE '=' expression 
+   : VARIABLE '=' expression
    ;
 /* les instructions afficher / lire  */
-   
-   
+
+
 lire returns[ String code ]
    : LIRE LPAREN expression RPAREN
    ;
@@ -53,22 +53,35 @@ afficher returns[ String code ]
    : AFFICHER LPAREN expression RPAREN
    ;
 /* --------------------------------- */
-   
-   
+
+
 tantque returns[ String code ]
    : TANTQUE LPAREN expression RPAREN
    ;
 
+si returns [ String code ]
+   : SI LPAREN expression RPAREN //()
+   | SI LPAREN expression RPAREN LBRACE instruction+ RBRACE //Si (1+1) { test}
+   ;
+
+sinon returns [ String code]
+   : SINON instruction
+   | SINON LBRACE instruction+ RBRACE  //Si (1+1) { test}
+   ;
+
 repeter returns[ String code ]
-   : REPETER LBRACE instruction* RBRACE tantque
-   // | REPETER NEWLINE instruction+ NEWLINE tantque
-   
+   : REPETER instruction+
+   | REPETER LBRACE instruction+ RBRACE tantque
+
+
    ;
 
 instruction returns[ String code ]
    : expression finInstruction
    | repeter
    | tantque
+   | si
+   | sinon
    | afficher finInstruction
    | lire finInstruction
    | declaration finInstruction
@@ -77,7 +90,7 @@ instruction returns[ String code ]
    {$code="";}
    ;
 /*=========================== lexer ========================*/
-   
+
 
 LPAREN
    : '('
@@ -119,6 +132,14 @@ AFFICHER
 
 TANTQUE
    : 'tantque'
+   ;
+
+SI
+   :'si'
+   ;
+
+SINON
+   :'sinon'
    ;
 
 REPETER
@@ -185,7 +206,7 @@ TYPE
 
 
 VARIABLE
-   : ('A' .. 'Z' | 'a' .. 'z')+
+   : ('A' .. 'Z' | 'a' .. 'z')+ ('0' .. '9')*
    ;
 
 
