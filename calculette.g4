@@ -1,9 +1,28 @@
 grammar calculette;
 
-@ members
+@members
 {
-    private TablesSymboles tablesSymboles = new TablesSymboles();
+   private TablesSymboles tablesSymboles = new TablesSymboles();
+
+   private int _cur_label = 1;
+   private String getNewLabel() 
+   {
+    return "B" +(_cur_label++); 
+   }
+
+   private boolean testInt(String var)
+   {
+      String int_regex = "[0-9]+";
+      return var.matches(int_regex);
+   }
+
+   private boolean testFloat(String var)
+   {
+      String float_regex = "[0-9]+\\.[0-9]+";
+      return var.matches(float_regex);
+   }
 }
+
 calcul returns[ String code ] @ init
    { $code = new String(); } // On initialise $code, pour ensuite l'utiliser comme accumulateur
    @ after
@@ -19,59 +38,151 @@ expression returns[ String code ]
    | NOT expression
    | expression 'and' expression
    | expression 'or' expression
-   | expression (GT | GE | LT | LE | EQ) expression
+   | expression op=(GT | GE | LT | LE | EQ) expression
+   {
+      if ($op.text.equals(">"))
+      {
+         $code = "SUP";
+      }
+
+      if ($op.text.equals(">="))
+      {
+         $code = "SUPEQ";
+      }
+
+      if ($op.text.equals("<"))
+      {
+         $code = "INF";
+      }
+
+      if ($op.text.equals("<="))
+      {
+         $code = "INFEQ";
+      }
+
+      if ($op.text.equals("=="))
+      {
+         $code = "EQUAL";
+      }
+   }
    | expression '<>' expression // !=
    | expression '^' expression // la puissance doit être prioritaire
    | left = expression '*' right = expression
-   | expression '/' expression
-   { $code += " HALT\n"; }
-   | left = expression '+' left = expression
-   { $code += " HALT\n"; }
+   {
+
+      if (testInt($left.text) && testInt($right.text))
+      {
+         $code = "MUL" + "\n";
+      }
+
+
+
+      if (testFloat($left.text) && testFloat($right.text))
+      {
+         $code = "FMUL" + "\n";
+      }
+
+      $code = " HALT\n";
+   }
+   | left = expression '/' right = expression
+   { 
+      if(testInt($left.text) && testInt($right.text))
+      {
+         $code = "DIV" + "\n";
+      }
+
+
+
+      if (testFloat($left.text) && testFloat($right.text))
+      {
+         $code = "FDIV" + "\n";
+      }
+
+      $code = " HALT\n";
+   }
+   | left = expression '+' right = expression
+   { 
+      if (testInt($left.text) && testInt($right.text))
+      {
+         $code = "ADD" + "\n";
+      }
+
+
+
+      if (testFloat($left.text) && testFloat($right.text))
+      {
+         $code = "FADD" + "\n";
+      }
+
+      $code = " HALT\n";
+   }
    | left = expression '-' right = expression
    {
 
-       String int_regex = "[0-9]+" ;
-       if ($left.text.matches(int_regex) && $right.text.matches(int_regex)) {
-                $code += "SUB " + "\n";
-        }
+      if (testInt($left.text) && testInt($right.text))
+      {
+         $code = "SUB" + "\n";
+      }
 
-       String float_regex = "[0-9]+\\.[0-9]+";
 
-       if ($left.text.matches(float_regex) && $right.text.matches(float_regex)) {
-           $code += "SUBF " + "\n";
-       }
 
-       $code += " HALT\n";
+      if (testFloat($left.text) && testFloat($right.text))
+      {
+         $code = "FSUB" + "\n";
+      }
 
-    }
-   | '-' expression // negative values
+      $code = " HALT\n";
+
+   }
+
    | VARIABLE
    {
-          System.out.println("PUSHG");
           AdresseType at = tablesSymboles.getAdresseType($VARIABLE.text);
-          $code += "  PUSHG " + at.adresse + "\n";
+          $code = "PUSHG" + at.adresse + "\n";
    }
    | BOOLEAN
+   {
+      if($BOOLEAN.text.equals("true"))
+      {
+         $code = "PUSHI 1 \n";
+      }
+
+      if($BOOLEAN.text.equals("false"))
+      {
+         $code = "PUSHI 0 \n";
+      }
+      
+   }
    | IDENTIFIANT
    {
 
-       AdresseType at = tablesSymboles.getAdresseType($IDENTIFIANT.text);
-       $code += "  PUSHG " + at.adresse + "\n";
+      AdresseType at = tablesSymboles.getAdresseType($IDENTIFIANT.text);
+      $code = "PUSHG" + at.adresse + "\n";
    }
    | ENTIER
    {
-           System.out.println("PUSHI");
-           $code = "  PUSHI " + $ENTIER.text + "\n";
+      $code = "PUSHI" + $ENTIER.text + "\n";
+   }
+   | '-' ENTIER
+   {
+      $code = "PUSHI -" + $ENTIER.text + "\n"; //Negative int
    }
    | FLOAT
    {
-        System.out.println("PUSHF");
-        $code = "  PUSHF " + $FLOAT.text + "\n";
+      $code = "PUSHF" + $FLOAT.text + "\n";
+   }
+   | '-' FLOAT
+   {
+      $code = "PUSHF -" + $FLOAT.text + "\n"; //Negative float
    }
    ;
 
-finInstruction
+finInstruction returns[ String code ]
    : (NEWLINE | ';')+
+   {
+
+      $code = "Fin d'instruction \n";
+   }
    ;
 
 declaration returns[ String code ]
@@ -100,13 +211,13 @@ assignation returns[ String code ]
    
    
 lire returns[ String code ]
-   : LIRE LPAREN expression RPAREN // a modifier expression -> identifiant
+   : LIRE LPAREN expression RPAREN  // a modifier expression -> identifiant
    
 /* AdresseType at = tablesSymboles.getAdresseType($IDENTIFIANT.text); */
 
    {
 
-           $code =  " READ \n";
+           $code =  "READ \n";
            //  $code += " STOREG " + at.adresse + "\n";
    }
    ;
@@ -115,14 +226,25 @@ afficher returns[ String code ]
    : AFFICHER LPAREN expression RPAREN
    {
         $code = $expression.code;
-        $code += " WRITE \n  POP\n";
+        $code += "WRITE \n  POP\n";
    }
    ;
 /* --------------------------------- */
    
    
 tantque returns[ String code ]
-   : TANTQUE LPAREN expression RPAREN
+   : TANTQUE LPAREN expression RPAREN (LBRACE instruction+ RBRACE)*
+   {
+       String boucleIn = getNewLabel();
+        String boucleOut = getNewLabel();
+        $code = "LABEL " + boucleIn +"\n";
+        $code += $expression.code;
+        $code += "JUMPF " + boucleOut + "\n";
+        $code += $instruction.code;
+        $code += "JUMP " + boucleIn+"\n";
+        $code += "LABEL " + boucleOut + "\n";
+
+   }
    ;
 
 si returns[ String code ]
@@ -160,11 +282,11 @@ instruction returns[ String code ]
    | si
    {
          $code = $si.code;
-    }
+   }
    | sinon
    {
             $code = $sinon.code;
-    }
+   }
    | afficher finInstruction
    {
         $code = $afficher.code;
@@ -176,13 +298,15 @@ instruction returns[ String code ]
    | declaration finInstruction
    {
       $code = $declaration.code;
-  }
+   }
    | assignation finInstruction
    {
      $code = $assignation.code;
- }
+   }
    | finInstruction
-   {$code="";}
+   {
+      $code = $finInstruction.code;
+   }
    ;
 /*=========================== lexer ========================*/
    
